@@ -1,5 +1,5 @@
 #!/bin/bash
-echo uv --version
+uv --version
 if [ "$?" -ne "0" ]
 then
     curl -LsSf https://astral.sh/uv/install.sh | sh
