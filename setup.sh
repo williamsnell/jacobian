@@ -1,3 +1,4 @@
+#!/bin/bash
 echo uv --version
 if [ "$?" -ne "0" ]
 then
