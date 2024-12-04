@@ -2,6 +2,7 @@ from jac import calc_jacobian
 from transformer_lens import HookedTransformer
 from transformers import AutoTokenizer
 import torch as t
+import matplotlib.pyplot as plt
 from datasets import load_dataset
 
 if __name__ == '__main__':
@@ -17,13 +18,16 @@ if __name__ == '__main__':
 
     for i, batch in zip(range(2), ds['train'].iter(batch_size=batch_size)):
         flattened = "".join([char for text in batch["text"] for char in text])
-        for j in range(len(flattened)//context_size):
+        #for j in range(len(flattened)//context_size):
+        for j in range(1):
             tokens = tokenizer(
                         flattened[j * context_size : (j + 1) * context_size],
                         max_length=1024,
                         return_tensors="pt").input_ids
-            
-            res = model(tokens)
 
-
+            jac = calc_jacobian(model.blocks[0].hook_resid_mid, model.blocks[0].hook_resid_post, model, tokens)
+            plt.imshow(einops.rearrange(jacobian[:num_batch, :num_seq], 
+                "batch seq d_res1 d_res2 -> (seq d_res1) (batch d_res2)").cpu(), vmin=-1, vmax=1)
+            plt.colorbar(f)
+            plt.savefig(f"{i}-{j}.png")
 
