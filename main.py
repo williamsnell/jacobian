@@ -2,6 +2,7 @@ from jac import calc_jacobian
 from transformer_lens import HookedTransformer
 from transformers import AutoTokenizer
 import torch as t
+import einops
 import matplotlib.pyplot as plt
 from datasets import load_dataset
 
@@ -25,9 +26,11 @@ if __name__ == '__main__':
                         max_length=1024,
                         return_tensors="pt").input_ids
 
-            jac = calc_jacobian(model.blocks[0].hook_resid_mid, model.blocks[0].hook_resid_post, model, tokens)
-            plt.imshow(einops.rearrange(jacobian[:num_batch, :num_seq], 
+            jac = calc_jacobian(model.blocks[0].hook_resid_mid, model.blocks[0].hook_resid_post, model, tokens,
+                                stop_idx=16)
+            f = plt.imshow(einops.rearrange(jac, 
                 "batch seq d_res1 d_res2 -> (seq d_res1) (batch d_res2)").cpu(), vmin=-1, vmax=1)
             plt.colorbar(f)
             plt.savefig(f"{i}-{j}.png")
+
 

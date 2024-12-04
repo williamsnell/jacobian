@@ -2,6 +2,7 @@ import torch as t
 import einops
 
 from torch import Tensor
+from typing import Optional
 from jaxtyping import Float
 
 
@@ -89,7 +90,8 @@ def calc_jacobian(
     upstream_vec: Float[Tensor, "d_up"],
     downstream_vec: Float[Tensor, "d_down"],
     model: t.nn.Module,
-    tokens: Float[Tensor, "batch seq 1"]
+    tokens: Float[Tensor, "batch seq 1"],
+    stop_idx: Optional[int] = None,
     ) -> Float[Tensor, "batch seq d_down d_up"]:
   """
       Return the jacobian,
@@ -111,7 +113,7 @@ def calc_jacobian(
 
       for i in range(tokens.shape[0]):
           get_jacobian, get_upstream_vec, remove_hooks = attach_jacobian_hooks(
-              upstream_vec, downstream_vec, model, model.cfg.d_model
+              upstream_vec, downstream_vec, model, model.cfg.d_model if stop_idx is None else stop_idx
               )
 
           # Run a forward pass through the model
@@ -124,3 +126,4 @@ def calc_jacobian(
       model.requires_grad_(False)
 
   return t.cat(jacs)
+
