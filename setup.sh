@@ -2,6 +2,9 @@
 # Try add UV to the path, and then run it
 source $HOME/.local/bin/env
 
+# Also write this to the ~/.bashrc
+echo source $HOME/.local/bin/env >> ~/.bashrc
+
 uv --version
 # Install uv if it isn't already
 if [ "$?" -ne "0" ]
